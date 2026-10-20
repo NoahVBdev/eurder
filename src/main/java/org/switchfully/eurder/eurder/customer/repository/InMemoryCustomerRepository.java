@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,6 +37,11 @@ public class InMemoryCustomerRepository implements CustomerRepository {
     @Override
     public boolean existsByEmail(String email) {
         return customers.values().stream().anyMatch(customer -> customer.getEmail().equalsIgnoreCase(email));
+    }
+
+    @Override
+    public Optional<Customer> findById(UUID id) {
+        return Optional.ofNullable(customers.get(id));
     }
 
     /**
