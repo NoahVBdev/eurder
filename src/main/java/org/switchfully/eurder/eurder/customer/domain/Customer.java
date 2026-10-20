@@ -14,11 +14,13 @@ public class Customer {
     private String phoneNumber;
 
     public Customer(String firstName, String lastName, String email, Address address, String phoneNumber) {
-        if (firstName.isBlank()) throw new IllegalArgumentException("First address is required");
-        if (lastName.isBlank()) throw new IllegalArgumentException("Last address is required");
-        if (!EmailValidator.getInstance().isValid(email)) throw new IllegalArgumentException("Valid email is required");
+        if (firstName == null || firstName.isBlank()) throw new IllegalArgumentException("First name is required");
+        if (lastName == null || lastName.isBlank()) throw new IllegalArgumentException("Last name is required");
+        if (email == null || !EmailValidator.getInstance().isValid(email))
+            throw new IllegalArgumentException("Valid email is required");
         if (address == null) throw new IllegalArgumentException("Address is required");
-        if (phoneNumber.isBlank()) throw new IllegalArgumentException("Phone number is required");
+        if (phoneNumber == null || phoneNumber.isBlank())
+            throw new IllegalArgumentException("Phone number is required");
 
         this.id = UUID.randomUUID();
         this.firstName = firstName;
@@ -52,10 +54,6 @@ public class Customer {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public Address getAddress() {
         return address;
     }
@@ -77,15 +75,24 @@ public class Customer {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return Objects.equals(id, customer.id) && Objects.equals(firstName, customer.firstName) && Objects.equals(lastName, customer.lastName) && Objects.equals(email, customer.email) && Objects.equals(address, customer.address) && Objects.equals(phoneNumber, customer.phoneNumber);
+        return Objects.equals(id, customer.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, email, address, phoneNumber);
+        return Objects.hashCode(id);
     }
 
     public record Address(String street, String houseNumber, String postalCode, String city, String country) {
+        public Address {
+            if (street == null || street.isBlank()) throw new IllegalArgumentException("Street is required");
+            if (houseNumber == null || houseNumber.isBlank())
+                throw new IllegalArgumentException("House number is required");
+            if (postalCode == null || postalCode.isBlank())
+                throw new IllegalArgumentException("Postal code is required");
+            if (city == null || city.isBlank()) throw new IllegalArgumentException("City is required");
+            if (country == null || country.isBlank()) throw new IllegalArgumentException("Country is required");
+        }
     }
 }
 
