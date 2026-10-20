@@ -126,4 +126,29 @@ class ItemTest {
             assertThat(item.getAmount()).isZero();
         }
     }
+
+    @Nested
+    @DisplayName("Decreasing stock")
+    class DecreaseStock {
+
+        @Test
+        @DisplayName("Decrease stock subtracts ordered amount")
+        void decreaseStock_subtractsOrderedAmount() {
+            Item item = new Item("Fridge", "Cold", new BigDecimal("500.00"), 10);
+
+            item.decreaseStock(3);
+
+            assertThat(item.getAmount()).isEqualTo(7);
+        }
+
+        @Test
+        @DisplayName("Decreasing stock more than available amount becomes zero")
+        void decreaseStock_moreThanAvailable_stockBecomesZero() {
+            Item item = new Item("Fridge", "Cold", new BigDecimal("500.00"), 2);
+
+            item.decreaseStock(5);
+
+            assertThat(item.getAmount()).isZero();
+        }
+    }
 }

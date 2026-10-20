@@ -17,12 +17,12 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Eurder API")
-                        .description("Order management back end: customers, items and eurders.")
+                        .description("Order management back end: customers, items and orders.")
                         .version("v1")
                         .contact(new Contact().name("NoahVBDev").email("noahvanbrabant@hotmail.com")))
                 .tags(List.of(
                         new Tag().name("Customers").description("Create and view customers"),
                         new Tag().name("Items").description("Manage items and stock"),
-                        new Tag().name("Eurders").description("Place, view and reorder eurders")));
+                        new Tag().name("Orders").description("Place, view and reorder orders")));
     }
 }

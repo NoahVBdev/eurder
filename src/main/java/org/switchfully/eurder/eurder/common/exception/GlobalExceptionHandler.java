@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.switchfully.eurder.eurder.customer.exception.CustomerNotFoundException;
+import org.switchfully.eurder.eurder.eurder.exception.ItemGroupException;
+import org.switchfully.eurder.eurder.eurder.exception.OrderException;
+import org.switchfully.eurder.eurder.item.exception.ItemNotFoundException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -81,5 +85,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private ProblemDetail problem(HttpStatus status, Exception ex, HttpServletRequest req) {
         log.warn("{} on {} {}: {}", status.value(), req.getMethod(), req.getRequestURI(), ex.getMessage());
         return ProblemDetail.forStatusAndDetail(status, ex.getMessage());
+    }
+
+    // Not found exception
+    @ExceptionHandler({CustomerNotFoundException.class, ItemNotFoundException.class})
+    public ProblemDetail handleNotFound(RuntimeException ex, HttpServletRequest request) {
+        log.error("Not found on {} {}: {}", request.getMethod(), request.getRequestURI(), ex.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Resource not found");
+        return problem;
+    }
+
+    // Invalid order exception
+    @ExceptionHandler({ItemGroupException.class, OrderException.class})
+    public ProblemDetail handleInvalidOrder(RuntimeException ex, HttpServletRequest request) {
+        log.error("Invalid order on {} {}: {}", request.getMethod(), request.getRequestURI(), ex.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Invalid order");
+        return problem;
     }
 }

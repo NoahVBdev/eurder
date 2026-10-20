@@ -51,6 +51,10 @@ public class Item {
         return amount;
     }
 
+    public void decreaseStock(int orderedAmount) {
+        this.amount = Math.max(0, this.amount - orderedAmount);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

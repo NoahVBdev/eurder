@@ -32,5 +32,4 @@ public class CustomerController {
     public CustomerDTO createCustomer(@Valid @RequestBody CreateCustomerDTO createCustomerDTO) {
         return customerService.createCustomer(createCustomerDTO);
     }
-
 }
