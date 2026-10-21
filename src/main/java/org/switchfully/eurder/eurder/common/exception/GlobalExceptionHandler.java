@@ -15,6 +15,8 @@ import org.switchfully.eurder.eurder.customer.exception.CustomerNotFoundExceptio
 import org.switchfully.eurder.eurder.eurder.exception.ItemGroupException;
 import org.switchfully.eurder.eurder.eurder.exception.OrderException;
 import org.switchfully.eurder.eurder.item.exception.ItemNotFoundException;
+import org.switchfully.eurder.eurder.security.exception.ForbiddenException;
+import org.switchfully.eurder.eurder.security.exception.UnauthorizedException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -104,4 +106,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problem.setTitle("Invalid order");
         return problem;
     }
+
+    // Security
+    @ExceptionHandler({UnauthorizedException.class})
+    public ProblemDetail handleUnauthorized(RuntimeException ex, HttpServletRequest request) {
+        log.error("Unauthorized request on {} {}: {}", request.getMethod(), request.getRequestURI(), ex.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        problem.setTitle("Unauthorized request");
+        return problem;
+    }
+
 }

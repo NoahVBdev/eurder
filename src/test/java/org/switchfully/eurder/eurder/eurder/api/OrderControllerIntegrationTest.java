@@ -47,7 +47,7 @@ class OrderControllerIntegrationTest {
     private Customer aCustomer() {
         return customerRepository.save(new Customer("Jan", "Peeters", "jan@mail.be",
                 new Customer.Address("Nieuwstraat", "1", "1000", "Brussel", "Belgie"),
-                "0470123456"));
+                "0470123456", "{noop}password"));
     }
 
     private Item anItem(String name, String price, int stock) {

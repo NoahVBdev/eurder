@@ -10,14 +10,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CustomerTest {
-
+    private final String PLAIN_DUMMY_PASSWORD = "{noop}password";
     private final Customer.Address address = new Customer.Address("Rue Neuve", "1", "1000", "Brussels", "Belgium");
 
     @Test
     @DisplayName("new customer given a valid email gets an id")
     void newCustomer_givenValidEmail_getsAnId() {
         // GIVEN
-        Customer customer = new Customer("Jane", "Smith", "jane.smith@example.com", address, "+32 470 12 34 56");
+        Customer customer = new Customer("Jane", "Smith", "jane.smith@example.com", address, "+32 470 12 34 56", PLAIN_DUMMY_PASSWORD);
 
         // Then
         assertThat(customer.getId()).isNotNull();
@@ -26,8 +26,8 @@ class CustomerTest {
     @Test
     @DisplayName("two customers get different IDs")
     void twoCustomers_getDifferentIds() {
-        Customer first = new Customer("Jane", "Smith", "jane.smith@example.com", address, "+32 470 12 34 56");
-        Customer second = new Customer("John", "Doe", "john.doe@example.com", address, "+32 470 12 34 70");
+        Customer first = new Customer("Jane", "Smith", "jane.smith@example.com", address, "+32 470 12 34 56", PLAIN_DUMMY_PASSWORD);
+        Customer second = new Customer("John", "Doe", "john.doe@example.com", address, "+32 470 12 34 70", PLAIN_DUMMY_PASSWORD);
 
         assertThat(first.getId()).isNotEqualTo(second.getId());
     }
@@ -35,14 +35,14 @@ class CustomerTest {
     @Test
     @DisplayName("blank first address throws an exception")
     void blankFirstName_throwsException() {
-        assertThatThrownBy(() -> new Customer(" ", "Doe", "jane@example.com", address, "0470"))
+        assertThatThrownBy(() -> new Customer(" ", "Doe", "jane@example.com", address, "0470", PLAIN_DUMMY_PASSWORD))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("blank last address throws an exception")
     void blankLastName_throwsException() {
-        assertThatThrownBy(() -> new Customer("Jane", " ", "jane@example.com", address, "0470"))
+        assertThatThrownBy(() -> new Customer("Jane", " ", "jane@example.com", address, "0470", PLAIN_DUMMY_PASSWORD))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

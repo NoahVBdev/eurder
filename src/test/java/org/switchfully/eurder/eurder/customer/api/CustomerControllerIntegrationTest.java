@@ -8,12 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
 import org.switchfully.eurder.eurder.customer.exception.CustomerNotFoundException;
 import org.switchfully.eurder.eurder.customer.repository.InMemoryCustomerRepository;
 import org.switchfully.eurder.eurder.customer.service.CustomerService;
+import org.switchfully.eurder.eurder.security.TestAuth;
+import org.switchfully.eurder.eurder.security.service.SecurityService;
 
 import java.util.UUID;
 
@@ -70,6 +73,7 @@ class CustomerControllerIntegrationTest {
         @DisplayName("with valid data returns 201 Is Created and customer")
         void createCustomer_givenValidData_returns201andCustomer() throws Exception {
             mockMvc.perform(post("/customers")
+                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(VALID_CUSTOMER))
                     .andExpect(status().isCreated())
@@ -83,6 +87,7 @@ class CustomerControllerIntegrationTest {
         @DisplayName("with invalid email returns 400 Bad Request")
         void createCustomer_withInvalidEmail_returns400() throws Exception {
             mockMvc.perform(post("/customers")
+                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(VALID_CUSTOMER.replace("jane.smith@example.com", "invalid-email")))
                     .andExpect(status().isBadRequest());
@@ -126,6 +131,7 @@ class CustomerControllerIntegrationTest {
 
             // Act + Assert
             mockMvc.perform(get("/customers")
+                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.length()").value(2))
@@ -138,6 +144,7 @@ class CustomerControllerIntegrationTest {
         void getAllCustomers_whenNoCustomersRegistered_returns404() throws Exception {
             // Act + Assert
             mockMvc.perform(get("/customers")
+                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isNotFound());
         }
@@ -152,6 +159,7 @@ class CustomerControllerIntegrationTest {
         void getCustomer_givenCustomerExists_returns200AndCustomer() throws Exception {
             // Arrange
             String response = mockMvc.perform(post("/customers")
+                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(VALID_CUSTOMER))
                     .andExpect(status().isCreated())
@@ -175,6 +183,7 @@ class CustomerControllerIntegrationTest {
         void getCustomer_unknownId_returns404CouldNotFindCustomerException() throws Exception {
             // Arrange
             String response = mockMvc.perform(post("/customers")
+                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(VALID_CUSTOMER))
                     .andExpect(status().isCreated())

@@ -3,6 +3,7 @@ package org.switchfully.eurder.eurder.customer.service;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.switchfully.eurder.eurder.common.exception.ResourceNotFoundException;
 import org.switchfully.eurder.eurder.customer.api.dto.CreateCustomerDTO;
@@ -23,17 +24,20 @@ public class CustomerService {
 
     private final InMemoryCustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public CustomerService(InMemoryCustomerRepository customerRepository, CustomerMapper customerMapper) {
+    public CustomerService(InMemoryCustomerRepository customerRepository, CustomerMapper customerMapper, PasswordEncoder passwordEncoder) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public CustomerDTO createCustomer(@Valid CreateCustomerDTO createCustomerDTO) {
         if (customerRepository.existsByEmail(createCustomerDTO.email())) {
             throw new EmailAlreadyInUseException(createCustomerDTO.email());
         }
-        Customer saved = customerRepository.save(customerMapper.toDomain(createCustomerDTO));
+        String passwordHash = passwordEncoder.encode(createCustomerDTO.password());  // Hash password before saving
+        Customer saved = customerRepository.save(customerMapper.toDomain(createCustomerDTO, passwordHash));
         return customerMapper.toDTO(saved);
     }
 
@@ -52,6 +56,15 @@ public class CustomerService {
              log.debug("Could not find customer with id: " + id.toString());
              throw new CustomerNotFoundException(id.toString()) ;
          }
+        return customerMapper.toDTO(customer.get());
+    }
+
+    public CustomerDTO findCustomerByEmail(String customerEmail) {
+        Optional<Customer> customer = customerRepository.findByEmail(customerEmail);
+        if (customer.isEmpty()) {
+            log.debug("Could not find customer with email: " + customerEmail);
+            throw new CustomerNotFoundException(customerEmail) ;
+        }
         return customerMapper.toDTO(customer.get());
     }
 }
