@@ -8,10 +8,13 @@ import org.switchfully.eurder.eurder.common.exception.ResourceNotFoundException;
 import org.switchfully.eurder.eurder.customer.api.dto.CreateCustomerDTO;
 import org.switchfully.eurder.eurder.customer.api.dto.CustomerDTO;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
+import org.switchfully.eurder.eurder.customer.exception.CustomerNotFoundException;
 import org.switchfully.eurder.eurder.customer.exception.EmailAlreadyInUseException;
 import org.switchfully.eurder.eurder.customer.repository.InMemoryCustomerRepository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CustomerService {
@@ -41,5 +44,14 @@ public class CustomerService {
             throw new ResourceNotFoundException("No customers found");
         }
         return customerMapper.toDTO(customers);
+    }
+
+    public CustomerDTO findCustomerById(UUID id) throws CustomerNotFoundException {
+         Optional<Customer> customer = customerRepository.findById(id);
+         if (customer.isEmpty()) {
+             log.debug("Could not find customer with id: " + id.toString());
+             throw new CustomerNotFoundException(id.toString()) ;
+         }
+        return customerMapper.toDTO(customer.get());
     }
 }
