@@ -1,6 +1,7 @@
 package org.switchfully.eurder.eurder.customer.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.switchfully.eurder.eurder.customer.api.dto.CreateCustomerDTO;
 import org.switchfully.eurder.eurder.customer.api.dto.CustomerDTO;
 import org.switchfully.eurder.eurder.customer.service.CustomerService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/customers")
@@ -31,5 +34,14 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerDTO createCustomer(@Valid @RequestBody CreateCustomerDTO createCustomerDTO) {
         return customerService.createCustomer(createCustomerDTO);
+    }
+
+    @Operation(summary = "View all customers", description = "Story 7")
+    @ApiResponse(responseCode = "200", description = "Get all customers", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CustomerDTO.class))))
+    @ApiResponse(responseCode = "404", description = "No customers found", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+    @GetMapping(produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CustomerDTO> getAllCustomers() {
+        return customerService.getAllCustomers();
     }
 }
