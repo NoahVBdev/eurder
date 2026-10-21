@@ -59,6 +59,7 @@ public class SecurityService {
         // Check for admin
         if (adminEmail.equalsIgnoreCase(credentials.email())) {
             checkPassword(credentials.password(), adminPasswordHash);
+            log.trace("Logged in as admin");
             return new AuthenticatedUser(adminEmail, Role.ADMIN);
         }
 
@@ -70,6 +71,7 @@ public class SecurityService {
         checkPassword(credentials.password(), passwordHash);
 
         // Authorize user
+        log.trace("Logged in as customer");
         return new AuthenticatedUser(credentials.email(), Role.CUSTOMER);
     }
 

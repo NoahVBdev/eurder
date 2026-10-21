@@ -16,7 +16,6 @@ import org.switchfully.eurder.eurder.customer.exception.CustomerNotFoundExceptio
 import org.switchfully.eurder.eurder.customer.repository.InMemoryCustomerRepository;
 import org.switchfully.eurder.eurder.customer.service.CustomerService;
 import org.switchfully.eurder.eurder.security.TestAuth;
-import org.switchfully.eurder.eurder.security.service.SecurityService;
 
 import java.util.UUID;
 
