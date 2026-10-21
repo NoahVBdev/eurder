@@ -1,24 +1,22 @@
 package org.switchfully.eurder.eurder.eurder.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.switchfully.eurder.eurder.customer.repository.CustomerRepository;
+import org.switchfully.eurder.eurder.customer.service.CustomerService;
 import org.switchfully.eurder.eurder.eurder.repository.OrderRepository;
-import org.switchfully.eurder.eurder.item.repository.ItemRepository;
+import org.switchfully.eurder.eurder.item.service.ItemService;
 
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class OrderServiceTest {
 
     @Autowired
     OrderRepository orderRepository;
     @Autowired
-    ItemRepository itemRepository;
+    ItemService itemService;
     @Autowired
-    CustomerRepository customerRepository;
+    CustomerService customerService;
     @Autowired
     OrderMapper orderMapper;
 
@@ -26,6 +24,5 @@ class OrderServiceTest {
             LocalDate.of(2026, 10, 20).atStartOfDay(ZoneId.systemDefault()).toInstant(),
             ZoneId.systemDefault());
 
-    OrderService service = new OrderService(orderRepository, itemRepository, customerRepository, orderMapper, fixedClock);
-
+    OrderService service = new OrderService(orderRepository, itemService, customerService, orderMapper, fixedClock);
 }
