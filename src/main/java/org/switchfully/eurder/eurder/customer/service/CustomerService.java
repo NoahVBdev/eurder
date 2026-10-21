@@ -4,11 +4,14 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.switchfully.eurder.eurder.common.exception.ResourceNotFoundException;
 import org.switchfully.eurder.eurder.customer.api.dto.CreateCustomerDTO;
 import org.switchfully.eurder.eurder.customer.api.dto.CustomerDTO;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
 import org.switchfully.eurder.eurder.customer.exception.EmailAlreadyInUseException;
 import org.switchfully.eurder.eurder.customer.repository.InMemoryCustomerRepository;
+
+import java.util.List;
 
 @Service
 public class CustomerService {
@@ -29,5 +32,14 @@ public class CustomerService {
         }
         Customer saved = customerRepository.save(customerMapper.toDomain(createCustomerDTO));
         return customerMapper.toDTO(saved);
+    }
+
+    public List<CustomerDTO> getAllCustomers() {
+        List<Customer> customers = customerRepository.getAll();
+        if (customers.isEmpty()) {
+            log.debug("No customers found");
+            throw new ResourceNotFoundException("No customers found");
+        }
+        return customerMapper.toDTO(customers);
     }
 }

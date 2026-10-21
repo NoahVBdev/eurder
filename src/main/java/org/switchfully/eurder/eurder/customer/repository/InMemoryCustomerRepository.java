@@ -3,6 +3,7 @@ package org.switchfully.eurder.eurder.customer.repository;
 import org.springframework.stereotype.Repository;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,6 +43,11 @@ public class InMemoryCustomerRepository implements CustomerRepository {
     @Override
     public Optional<Customer> findById(UUID id) {
         return Optional.ofNullable(customers.get(id));
+    }
+
+    @Override
+    public List<Customer> getAll() {
+        return  customers.values().stream().toList();
     }
 
     /**

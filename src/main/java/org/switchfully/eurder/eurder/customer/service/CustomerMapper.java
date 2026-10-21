@@ -7,16 +7,20 @@ import org.switchfully.eurder.eurder.customer.api.dto.CreateCustomerDTO;
 import org.switchfully.eurder.eurder.customer.api.dto.CustomerDTO;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
 
+import java.util.List;
+
 @Component
 public class CustomerMapper {
+    //----------TO DOMAIN----------
     public Customer toDomain(@Valid CreateCustomerDTO createCustomerDTO) {
         return new Customer(createCustomerDTO.firstName(), createCustomerDTO.lastName(), createCustomerDTO.email(), this.toDomain(createCustomerDTO.address()), createCustomerDTO.phoneNumber());
     }
 
-    public Customer.Address toDomain(AddressDTO addressDTO) {
+    public Customer.Address toDomain(@Valid AddressDTO addressDTO) {
         return new Customer.Address(addressDTO.street(), addressDTO.houseNumber(), addressDTO.postalCode(), addressDTO.city(), addressDTO.country());
     }
 
+    //----------TO DTO----------
     public CustomerDTO toDTO(Customer saved) {
         return new CustomerDTO(saved.getId(), saved.getFirstName(), saved.getLastName(), saved.getEmail(), this.toDTO(saved.getAddress()), saved.getPhoneNumber());
     }
@@ -25,4 +29,7 @@ public class CustomerMapper {
         return new AddressDTO(address.street(), address.houseNumber(), address.postalCode(), address.city(), address.country());
     }
 
+    public List<CustomerDTO> toDTO(List<Customer> customers) {
+        return customers.stream().map(this::toDTO).toList();
+    }
 }
