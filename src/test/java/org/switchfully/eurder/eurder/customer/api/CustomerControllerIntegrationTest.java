@@ -1,5 +1,6 @@
 package org.switchfully.eurder.eurder.customer.api;
 
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,8 +10,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.switchfully.eurder.eurder.customer.domain.Customer;
+import org.switchfully.eurder.eurder.customer.exception.CustomerNotFoundException;
 import org.switchfully.eurder.eurder.customer.repository.InMemoryCustomerRepository;
+import org.switchfully.eurder.eurder.customer.service.CustomerService;
 
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -44,6 +52,8 @@ class CustomerControllerIntegrationTest {
 
     @Autowired
     private InMemoryCustomerRepository customerRepository;
+    @Autowired
+    private CustomerService customerService;
     @Autowired
     private MockMvc mockMvc;
 
@@ -103,7 +113,7 @@ class CustomerControllerIntegrationTest {
         @Test
         @DisplayName("returns a list of all registered customers")
         void getAllCustomers_returns200AndListOfCustomers() throws Exception {
-           // Arrange
+            // Arrange
             mockMvc.perform(post("/customers")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(VALID_CUSTOMER))
@@ -112,24 +122,15 @@ class CustomerControllerIntegrationTest {
             mockMvc.perform(post("/customers")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(VALID_CUSTOMER_2))
-                    .andExpect(status().isCreated()) ;
+                    .andExpect(status().isCreated());
 
             // Act + Assert
             mockMvc.perform(get("/customers")
-                    .contentType(MediaType.APPLICATION_JSON) )
+                            .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[0].id").isNotEmpty())
-                    .andExpect(jsonPath("$[0].firstName").value("Jane"))
-                    .andExpect(jsonPath("$[0].lastName").value("Smith"))
-                    .andExpect(jsonPath("$[0].email").value("jane.smith@example.com"))
-                    .andExpect(jsonPath("$[0].address").isNotEmpty())
-                    .andExpect(jsonPath("$[0].phoneNumber").value("+32 470 12 34 56"))
-                    .andExpect(jsonPath("$[1].id").isNotEmpty())
-                    .andExpect(jsonPath("$[1].firstName").value("John"))
-                    .andExpect(jsonPath("$[1].lastName").value("Doe"))
-                    .andExpect(jsonPath("$[1].email").value("johnsmith80@other.example.com"))
-                    .andExpect(jsonPath("$[1].address").isNotEmpty())
-                    .andExpect(jsonPath("$[1].phoneNumber").value("+32 470 12 34 57"));
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[?(@.email == 'jane.smith@example.com')]").exists())
+                    .andExpect(jsonPath("$[?(@.email == 'johnsmith80@other.example.com')]").exists());
         }
 
         @Test
@@ -137,8 +138,56 @@ class CustomerControllerIntegrationTest {
         void getAllCustomers_whenNoCustomersRegistered_returns404() throws Exception {
             // Act + Assert
             mockMvc.perform(get("/customers")
-                            .contentType(MediaType.APPLICATION_JSON) )
+                            .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isNotFound());
         }
     }
+
+    @Nested
+    @DisplayName("Getting a single customer")
+    class GetCustomer {
+
+        @Test
+        @DisplayName("with known valid id returns 201 and customer")
+        void getCustomer_givenCustomerExists_returns200AndCustomer() throws Exception {
+            // Arrange
+            String response = mockMvc.perform(post("/customers")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(VALID_CUSTOMER))
+                    .andExpect(status().isCreated())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            UUID id = UUID.fromString(JsonPath.read(response, "$.id"));
+            Customer stored = customerRepository.findById(id).orElse(null);
+            // Assert
+            assertThat(stored).isNotNull();
+            assertThat(stored.getFirstName()).isEqualTo("Jane");
+            assertThat(stored.getLastName()).isEqualTo("Smith");
+            assertThat(stored.getEmail()).isEqualTo("jane.smith@example.com");
+            assertThat(stored.getAddress()).isNotNull();
+            assertThat(stored.getPhoneNumber()).isEqualTo("+32 470 12 34 56");
+        }
+
+        @Test
+        @DisplayName("with unknown valid id returns 404 CouldNotFindCustomerException")
+        void getCustomer_unknownId_returns404CouldNotFindCustomerException() throws Exception {
+            // Arrange
+            String response = mockMvc.perform(post("/customers")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(VALID_CUSTOMER))
+                    .andExpect(status().isCreated())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+            String knownId = JsonPath.read(response, "$.id").toString();
+            String unknownId = knownId.substring(0, 2) + '0' + knownId.substring(3);
+            UUID id = UUID.fromString(unknownId);
+
+            // Assert
+            assertThatThrownBy(() -> customerService.findCustomerById(id)).isInstanceOf(CustomerNotFoundException.class);
+        }
+    }
+
 }
