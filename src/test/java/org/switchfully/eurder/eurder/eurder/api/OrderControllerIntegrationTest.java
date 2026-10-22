@@ -2,11 +2,11 @@ package org.switchfully.eurder.eurder.eurder.api;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -16,6 +16,7 @@ import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateItemGroupDTO;
 import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateOrderDTO;
 import org.switchfully.eurder.eurder.item.domain.Item;
 import org.switchfully.eurder.eurder.item.repository.ItemRepository;
+import org.switchfully.eurder.eurder.security.TestAuth;
 import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
@@ -47,15 +48,16 @@ class OrderControllerIntegrationTest {
     private Customer aCustomer() {
         return customerRepository.save(new Customer("Jan", "Peeters", "jan@mail.be",
                 new Customer.Address("Nieuwstraat", "1", "1000", "Brussel", "Belgie"),
-                "0470123456"));
+                "0470123456", "{noop}password"));
     }
 
     private Item anItem(String name, String price, int stock) {
         return itemRepository.save(new Item(name, "Description", new BigDecimal(price), stock));
     }
 
-    private ResultActions placeOrder(CreateOrderDTO request) throws Exception {
+    private ResultActions placeOrder(String customerEmail, CreateOrderDTO request) throws Exception {
         return mockMvc.perform(post("/orders")
+                .header(HttpHeaders.AUTHORIZATION, TestAuth.basic(customerEmail, "password"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
     }
@@ -73,7 +75,7 @@ class OrderControllerIntegrationTest {
             CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 2)));
 
-            placeOrder(request)
+            placeOrder(customer.getEmail(),request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.totalPrice").value(20.00))
                     .andExpect(jsonPath("$.itemGroups.length()").value(1))
@@ -90,7 +92,7 @@ class OrderControllerIntegrationTest {
             CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 3)));
 
-            placeOrder(request)
+            placeOrder(customer.getEmail(),request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.itemGroups[0].shippingDate")
                             .value(LocalDate.now().plusDays(7).toString()));
@@ -105,7 +107,7 @@ class OrderControllerIntegrationTest {
             CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 4)));
 
-            placeOrder(request)
+            placeOrder(customer.getEmail(),request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.itemGroups[0].shippingDate")
                             .value(LocalDate.now().plusDays(1).toString()));
@@ -122,7 +124,7 @@ class OrderControllerIntegrationTest {
                     new CreateItemGroupDTO(fridge.getId(), 2),   // 1000.00
                     new CreateItemGroupDTO(lamp.getId(), 3)));   //   60.00
 
-            placeOrder(request)
+            placeOrder(customer.getEmail(),request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.itemGroups.length()").value(2))
                     .andExpect(jsonPath("$.totalPrice").value(1060.00));
@@ -137,7 +139,7 @@ class OrderControllerIntegrationTest {
             CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 2)));
 
-            placeOrder(request).andExpect(status().isCreated());
+            placeOrder(customer.getEmail(),request).andExpect(status().isCreated());
 
             Item updated = itemRepository.findById(item.getId()).orElseThrow();
             assertThat(updated.getAmount()).isEqualTo(3);
@@ -152,7 +154,7 @@ class OrderControllerIntegrationTest {
             CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 1)));
 
-            placeOrder(request)
+            placeOrder(customer.getEmail(),request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.itemGroups[0].pricePerUnit").value(50.00))
                     .andExpect(jsonPath("$.itemGroups[0].itemName").value("Mixer"));
@@ -164,14 +166,14 @@ class OrderControllerIntegrationTest {
     class FailurePaths {
 
         @Test
-        @DisplayName("Unknown customer returns 404")
-        void placeOrder_unknownCustomer_returns404() throws Exception {
+        @DisplayName("Unknown customer returns 401 unauthorized")
+        void placeOrder_unknownCustomer_returns401() throws Exception {
             Item item = anItem("Oven", "300.00", 5);
 
             CreateOrderDTO request = new CreateOrderDTO(NON_EXISTING_ID,
                     List.of(new CreateItemGroupDTO(item.getId(), 1)));
 
-            placeOrder(request).andExpect(status().isNotFound());
+            placeOrder("unknown@mail.com",request).andExpect(status().isUnauthorized());
         }
 
 
@@ -183,7 +185,7 @@ class OrderControllerIntegrationTest {
             CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
                     List.of(new CreateItemGroupDTO(NON_EXISTING_ID, 1)));
 
-            placeOrder(request).andExpect(status().isNotFound());
+            placeOrder(customer.getEmail(),request).andExpect(status().isNotFound());
         }
 
         @Test
@@ -195,7 +197,7 @@ class OrderControllerIntegrationTest {
             CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 0)));
 
-            placeOrder(request).andExpect(status().isBadRequest());
+            placeOrder(customer.getEmail(),request).andExpect(status().isBadRequest());
         }
 
         @Test
@@ -207,7 +209,7 @@ class OrderControllerIntegrationTest {
             CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), -1)));
 
-            placeOrder(request).andExpect(status().isBadRequest());
+            placeOrder(customer.getEmail(),request).andExpect(status().isBadRequest());
         }
 
         @Test
@@ -217,7 +219,7 @@ class OrderControllerIntegrationTest {
 
             CreateOrderDTO request = new CreateOrderDTO(customer.getId(), List.of());
 
-            placeOrder(request).andExpect(status().isBadRequest());
+            placeOrder(customer.getEmail(),request).andExpect(status().isBadRequest());
         }
     }
 }

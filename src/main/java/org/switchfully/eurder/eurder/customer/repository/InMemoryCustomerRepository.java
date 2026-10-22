@@ -50,6 +50,13 @@ public class InMemoryCustomerRepository implements CustomerRepository {
         return  customers.values().stream().toList();
     }
 
+    @Override
+    public Optional<Customer> findByEmail(String email) {
+        return customers.values().stream()
+                .filter(customer -> customer.getEmail().equalsIgnoreCase(email))
+                .findFirst();
+    }
+
     /**
      * <b>ONLY FOR TESTING PURPOSES</b>
      */

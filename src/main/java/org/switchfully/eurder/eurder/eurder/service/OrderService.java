@@ -30,8 +30,8 @@ public class OrderService {
         this.clock = clock;
     }
 
-    public OrderDTO placeOrder(CreateOrderDTO createOrderDTO) {
-        UUID customerId = customerService.findCustomerById(createOrderDTO.customerId()).id();
+    public OrderDTO placeOrder(String customerEmail, CreateOrderDTO createOrderDTO) {
+        UUID customerId = customerService.findCustomerByEmail(customerEmail).id();
         LocalDate today = LocalDate.now(clock);
         List<ItemGroup> itemGroups = itemService.createItemGroups(createOrderDTO, today);
         Order order = orderRepository.save(new Order(customerId, itemGroups));

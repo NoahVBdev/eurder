@@ -12,8 +12,9 @@ public class Customer {
     private String email;
     private Address address;
     private String phoneNumber;
+    private String passwordHash;
 
-    public Customer(String firstName, String lastName, String email, Address address, String phoneNumber) {
+    public Customer(String firstName, String lastName, String email, Address address, String phoneNumber, String passwordHash) {
         if (firstName == null || firstName.isBlank()) throw new IllegalArgumentException("First name is required");
         if (lastName == null || lastName.isBlank()) throw new IllegalArgumentException("Last name is required");
         if (email == null || !EmailValidator.getInstance().isValid(email))
@@ -21,6 +22,7 @@ public class Customer {
         if (address == null) throw new IllegalArgumentException("Address is required");
         if (phoneNumber == null || phoneNumber.isBlank())
             throw new IllegalArgumentException("Phone number is required");
+        if (passwordHash == null || passwordHash.isBlank()) throw new IllegalArgumentException("Password is required");
 
         this.id = UUID.randomUUID();
         this.firstName = firstName;
@@ -28,6 +30,7 @@ public class Customer {
         this.email = email;
         this.address = address;
         this.phoneNumber = phoneNumber;
+        this.passwordHash = passwordHash;
     }
 
     public UUID getId() {
@@ -64,6 +67,10 @@ public class Customer {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
     public void changeAddress(Address newAddress) {

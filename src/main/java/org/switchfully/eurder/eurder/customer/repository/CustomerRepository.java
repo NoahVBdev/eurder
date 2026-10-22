@@ -12,4 +12,5 @@ public interface CustomerRepository {
     boolean existsByEmail(String email);
     Optional<Customer> findById(@NotNull UUID id);
     List<Customer> getAll();
+    Optional<Customer> findByEmail(@NotNull String email);
 }

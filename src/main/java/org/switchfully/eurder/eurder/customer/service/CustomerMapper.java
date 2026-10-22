@@ -12,8 +12,8 @@ import java.util.List;
 @Component
 public class CustomerMapper {
     //----------TO DOMAIN----------
-    public Customer toDomain(@Valid CreateCustomerDTO createCustomerDTO) {
-        return new Customer(createCustomerDTO.firstName(), createCustomerDTO.lastName(), createCustomerDTO.email(), this.toDomain(createCustomerDTO.address()), createCustomerDTO.phoneNumber());
+    public Customer toDomain(@Valid CreateCustomerDTO createCustomerDTO, String passwordHash) {
+        return new Customer(createCustomerDTO.firstName(), createCustomerDTO.lastName(), createCustomerDTO.email(), this.toDomain(createCustomerDTO.address()), createCustomerDTO.phoneNumber(), passwordHash);
     }
 
     public Customer.Address toDomain(@Valid AddressDTO addressDTO) {
