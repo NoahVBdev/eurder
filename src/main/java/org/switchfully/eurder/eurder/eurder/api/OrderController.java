@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateOrderDTO;
 import org.switchfully.eurder.eurder.eurder.api.dto.response.OrderDTO;
 import org.switchfully.eurder.eurder.eurder.service.OrderService;
+import org.switchfully.eurder.eurder.item.api.ItemController;
 import org.switchfully.eurder.eurder.security.domain.AuthenticatedUser;
 import org.switchfully.eurder.eurder.security.domain.Feature;
 import org.switchfully.eurder.eurder.security.service.SecurityService;
@@ -21,6 +24,8 @@ import org.switchfully.eurder.eurder.security.service.SecurityService;
 @RequestMapping("/orders")
 @Tag(name = "Orders")
 public class OrderController {
+    private static final Logger log = LoggerFactory.getLogger(OrderController.class);
+    
     private final OrderService orderService;
     private final SecurityService securityService;
 
@@ -38,6 +43,7 @@ public class OrderController {
                                @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
                                @RequestBody CreateOrderDTO createOrderDTO) {
         AuthenticatedUser customer = securityService.validateAuthorization(authorization, Feature.PLACE_ORDER);
+        log.trace("Request to place order");
         return orderService.placeOrder(customer.email(), createOrderDTO);
     }
 }
