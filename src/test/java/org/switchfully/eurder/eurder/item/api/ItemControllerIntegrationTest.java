@@ -6,12 +6,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.switchfully.eurder.eurder.helper.IntegrationTest;
 import org.switchfully.eurder.eurder.item.domain.Item;
 import org.switchfully.eurder.eurder.item.repository.ItemRepository;
 import org.switchfully.eurder.eurder.security.TestAuth;
@@ -28,8 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@IntegrationTest
 class ItemControllerIntegrationTest {
 
     @Autowired
@@ -38,6 +36,8 @@ class ItemControllerIntegrationTest {
     ItemRepository itemRepository;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    TestAuth testAuth;
 
     // Item for every call
     private static Map<String, Object> validItem() {
@@ -57,7 +57,7 @@ class ItemControllerIntegrationTest {
     // Helper for post requests
     private ResultActions postItem(Map<String, Object> item) throws Exception {
         return mockMvc.perform(post("/items")
-                .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
+                .header(HttpHeaders.AUTHORIZATION, testAuth.admin())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(item)));
     }
