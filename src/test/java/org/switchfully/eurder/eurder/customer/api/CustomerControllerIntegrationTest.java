@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,8 +15,8 @@ import org.switchfully.eurder.eurder.customer.domain.Customer;
 import org.switchfully.eurder.eurder.customer.exception.CustomerNotFoundException;
 import org.switchfully.eurder.eurder.customer.repository.InMemoryCustomerRepository;
 import org.switchfully.eurder.eurder.customer.service.CustomerService;
+import org.switchfully.eurder.eurder.helper.IntegrationTest;
 import org.switchfully.eurder.eurder.security.TestAuth;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
@@ -29,8 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@IntegrationTest
 class CustomerControllerIntegrationTest {
     private static final Logger log = LoggerFactory.getLogger(CustomerControllerIntegrationTest.class);
 
@@ -57,7 +54,8 @@ class CustomerControllerIntegrationTest {
               "password": "{noop}password"
             }
             """;
-
+    @Autowired
+    TestAuth testAuth;
     @Autowired
     private InMemoryCustomerRepository customerRepository;
     @Autowired
@@ -123,20 +121,20 @@ class CustomerControllerIntegrationTest {
         void getAllCustomers_returns200AndListOfCustomers() throws Exception {
             // Arrange
             mockMvc.perform(post("/customers")
-                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
+                            .header(HttpHeaders.AUTHORIZATION, testAuth.admin())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(VALID_CUSTOMER))
                     .andExpect(status().isCreated());
 
             mockMvc.perform(post("/customers")
-                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
+                            .header(HttpHeaders.AUTHORIZATION, testAuth.admin())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(VALID_CUSTOMER_2))
                     .andExpect(status().isCreated());
 
             // Act + Assert
             mockMvc.perform(get("/customers")
-                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
+                            .header(HttpHeaders.AUTHORIZATION, testAuth.admin())
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.length()").value(2))
@@ -149,7 +147,7 @@ class CustomerControllerIntegrationTest {
         void getAllCustomers_whenNoCustomersRegistered_returns404() throws Exception {
             // Act + Assert
             mockMvc.perform(get("/customers")
-                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
+                            .header(HttpHeaders.AUTHORIZATION, testAuth.admin())
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isNotFound());
         }
@@ -163,9 +161,9 @@ class CustomerControllerIntegrationTest {
         @DisplayName("with known valid id returns 201 and customer")
         void getCustomer_givenCustomerExists_returns200AndCustomer() throws Exception {
             // Arrange
-            log.debug("Logging getCustomer_givenCustomerExists_returns200AndCustomer String response=" + TestAuth.ADMIN );
+            log.debug("Logging getCustomer_givenCustomerExists_returns200AndCustomer String response=%s".formatted(testAuth.admin()));
             String response = mockMvc.perform(post("/customers")
-                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN)
+                            .header(HttpHeaders.AUTHORIZATION, testAuth.admin())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(VALID_CUSTOMER))
                     .andReturn()
@@ -192,7 +190,7 @@ class CustomerControllerIntegrationTest {
 
             // Act
             mockMvc.perform(get("/customers/{id}", unknownId)
-                            .header(HttpHeaders.AUTHORIZATION, TestAuth.ADMIN))
+                            .header(HttpHeaders.AUTHORIZATION, testAuth.admin()))
                     .andExpect(status().isNotFound());
 
             // Assert

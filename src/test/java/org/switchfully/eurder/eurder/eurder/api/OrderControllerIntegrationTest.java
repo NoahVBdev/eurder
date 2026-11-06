@@ -4,8 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -14,6 +12,7 @@ import org.switchfully.eurder.eurder.customer.domain.Customer;
 import org.switchfully.eurder.eurder.customer.repository.CustomerRepository;
 import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateItemGroupDTO;
 import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateOrderDTO;
+import org.switchfully.eurder.eurder.helper.IntegrationTest;
 import org.switchfully.eurder.eurder.item.domain.Item;
 import org.switchfully.eurder.eurder.item.repository.ItemRepository;
 import org.switchfully.eurder.eurder.security.TestAuth;
@@ -29,8 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@IntegrationTest
 class OrderControllerIntegrationTest {
 
     private static final UUID NON_EXISTING_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
