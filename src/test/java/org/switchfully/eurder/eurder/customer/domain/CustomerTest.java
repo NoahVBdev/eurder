@@ -5,13 +5,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.switchfully.eurder.eurder.common.domain.Address;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CustomerTest {
     private final String PLAIN_DUMMY_PASSWORD = "{noop}password";
-    private final Customer.Address address = new Customer.Address("Rue Neuve", "1", "1000", "Brussels", "Belgium");
+    private final Address address = new Address("Rue Neuve", "1", "1000", "Brussels", "Belgium");
 
     @Test
     @DisplayName("new customer given a valid email gets an id")
@@ -69,6 +70,14 @@ class CustomerTest {
     })
     void invalidEmail_throwsException(String email) {
         assertThat(EmailValidator.getInstance().isValid(email)).isFalse();
+    }
+
+    @Test
+    @DisplayName("invalid email throws an exception")
+    void mixedCaseEmail_returnsEmailInLowerCase() {
+        Customer customer = new Customer("Jane", "Smith", "jaNe.sMIth@examPle.coM", address, "+32 470 12 34 56", PLAIN_DUMMY_PASSWORD);
+
+        assertThat(customer.getEmail()).isEqualTo("jane.smith@example.com");
     }
 
 }

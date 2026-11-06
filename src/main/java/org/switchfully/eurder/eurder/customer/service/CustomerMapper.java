@@ -2,6 +2,7 @@ package org.switchfully.eurder.eurder.customer.service;
 
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Component;
+import org.switchfully.eurder.eurder.common.domain.Address;
 import org.switchfully.eurder.eurder.customer.api.dto.AddressDTO;
 import org.switchfully.eurder.eurder.customer.api.dto.CreateCustomerDTO;
 import org.switchfully.eurder.eurder.customer.api.dto.CustomerDTO;
@@ -16,8 +17,8 @@ public class CustomerMapper {
         return new Customer(createCustomerDTO.firstName(), createCustomerDTO.lastName(), createCustomerDTO.email(), this.toDomain(createCustomerDTO.address()), createCustomerDTO.phoneNumber(), passwordHash);
     }
 
-    public Customer.Address toDomain(@Valid AddressDTO addressDTO) {
-        return new Customer.Address(addressDTO.street(), addressDTO.houseNumber(), addressDTO.postalCode(), addressDTO.city(), addressDTO.country());
+    public Address toDomain(@Valid AddressDTO addressDTO) {
+        return new Address(addressDTO.street(), addressDTO.houseNumber(), addressDTO.postalCode(), addressDTO.city(), addressDTO.country());
     }
 
     //----------TO DTO----------
@@ -25,7 +26,7 @@ public class CustomerMapper {
         return new CustomerDTO(saved.getId(), saved.getFirstName(), saved.getLastName(), saved.getEmail(), this.toDTO(saved.getAddress()), saved.getPhoneNumber());
     }
 
-    public AddressDTO toDTO(Customer.Address address) {
+    public AddressDTO toDTO(Address address) {
         return new AddressDTO(address.street(), address.houseNumber(), address.postalCode(), address.city(), address.country());
     }
 
