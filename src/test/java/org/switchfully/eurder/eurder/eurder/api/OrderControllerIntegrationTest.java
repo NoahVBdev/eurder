@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.switchfully.eurder.eurder.common.domain.Address;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
 import org.switchfully.eurder.eurder.customer.repository.CustomerRepository;
 import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateItemGroupDTO;
@@ -45,7 +46,7 @@ class OrderControllerIntegrationTest {
 
     private Customer aCustomer() {
         return customerRepository.save(new Customer("Jan", "Peeters", "jan@mail.be",
-                new Customer.Address("Nieuwstraat", "1", "1000", "Brussel", "Belgie"),
+                new Address("Nieuwstraat", "1", "1000", "Brussel", "Belgie"),
                 "0470123456", "{noop}password"));
     }
 

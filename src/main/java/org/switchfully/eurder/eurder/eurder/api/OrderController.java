@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateOrderDTO;
 import org.switchfully.eurder.eurder.eurder.api.dto.response.OrderDTO;
 import org.switchfully.eurder.eurder.eurder.service.OrderService;
-import org.switchfully.eurder.eurder.item.api.ItemController;
 import org.switchfully.eurder.eurder.security.domain.AuthenticatedUser;
 import org.switchfully.eurder.eurder.security.domain.Feature;
 import org.switchfully.eurder.eurder.security.service.SecurityService;

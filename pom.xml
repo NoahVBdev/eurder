@@ -68,6 +68,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!--        Flyway -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
+        </dependency>
+
         <!--        Email validation-->
         <dependency>
             <groupId>commons-validator</groupId>

@@ -1,7 +1,9 @@
 package org.switchfully.eurder.eurder.customer.domain;
 
 import org.apache.commons.validator.routines.EmailValidator;
+import org.switchfully.eurder.eurder.common.domain.Address;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -15,6 +17,7 @@ public class Customer {
     private String passwordHash;
 
     public Customer(String firstName, String lastName, String email, Address address, String phoneNumber, String passwordHash) {
+
         if (firstName == null || firstName.isBlank()) throw new IllegalArgumentException("First name is required");
         if (lastName == null || lastName.isBlank()) throw new IllegalArgumentException("Last name is required");
         if (email == null || !EmailValidator.getInstance().isValid(email))
@@ -27,7 +30,7 @@ public class Customer {
         this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
+        this.email = email.toLowerCase(Locale.ROOT);
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.passwordHash = passwordHash;
@@ -90,16 +93,5 @@ public class Customer {
         return Objects.hashCode(id);
     }
 
-    public record Address(String street, String houseNumber, String postalCode, String city, String country) {
-        public Address {
-            if (street == null || street.isBlank()) throw new IllegalArgumentException("Street is required");
-            if (houseNumber == null || houseNumber.isBlank())
-                throw new IllegalArgumentException("House number is required");
-            if (postalCode == null || postalCode.isBlank())
-                throw new IllegalArgumentException("Postal code is required");
-            if (city == null || city.isBlank()) throw new IllegalArgumentException("City is required");
-            if (country == null || country.isBlank()) throw new IllegalArgumentException("Country is required");
-        }
-    }
 }
 

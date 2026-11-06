@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.switchfully.eurder.eurder.common.domain.Address;
 import org.switchfully.eurder.eurder.security.exception.ForbiddenException;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
 import org.switchfully.eurder.eurder.customer.repository.InMemoryCustomerRepository;
@@ -26,7 +27,7 @@ class SecurityServiceTest {
     @BeforeEach
     void setUp() {
         customerRepository.save(new Customer("Jane", "Smith", "jane@example.com",
-                new Customer.Address("Rue Neuve", "1", "1000", "Brussels", "Belgium"),
+                new Address("Rue Neuve", "1", "1000", "Brussels", "Belgium"),
                 "0470", passwordEncoder.encode("jane-pw")));
     }
 
