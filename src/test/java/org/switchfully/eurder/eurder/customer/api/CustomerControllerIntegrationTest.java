@@ -11,9 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
 import org.switchfully.eurder.eurder.customer.exception.CustomerNotFoundException;
-import org.switchfully.eurder.eurder.customer.repository.InMemoryCustomerRepository;
+import org.switchfully.eurder.eurder.customer.repository.CustomerRepository;
 import org.switchfully.eurder.eurder.customer.service.CustomerService;
 import org.switchfully.eurder.eurder.helper.IntegrationTest;
 import org.switchfully.eurder.eurder.security.TestAuth;
@@ -57,11 +58,36 @@ class CustomerControllerIntegrationTest {
     @Autowired
     TestAuth testAuth;
     @Autowired
-    private InMemoryCustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
     @Autowired
     private CustomerService customerService;
     @Autowired
     private MockMvc mockMvc;
+
+    private static String customerJsonWithEmail(String email) {
+        return """
+                {
+                  "firstName": "Jane",
+                  "lastName": "Smith",
+                  "email": "%s",
+                  "address": {
+                    "street": "Rue Neuve",
+                    "houseNumber": "100B",
+                    "postalCode": "1000",
+                    "city": "Brussels",
+                    "country": "Belgium"
+                  },
+                  "phoneNumber": "+32425447444",
+                  "password": "secret-password"
+                }
+                """.formatted(email);
+    }
+
+    private ResultActions register(String email) throws Exception {
+        return mockMvc.perform(post("/customers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(customerJsonWithEmail(email)));
+    }
 
     @BeforeEach
     void setUp() {
@@ -198,4 +224,24 @@ class CustomerControllerIntegrationTest {
         }
     }
 
+    @Nested
+    @DisplayName("Email case")
+    class EmailCase {
+
+        @Test
+        @DisplayName("registering with a mixed-case email stores and returns it in lowercase")
+        void register_mixedCaseEmail_returnsLowercase() throws Exception {
+            register("Jane.Smith@Example.COM")
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.email").value("jane.smith@example.com"));
+        }
+
+        @Test
+        @DisplayName("registering an existing email in another case returns 409")
+        void register_existingEmailInOtherCase_returns409() throws Exception {
+            register("jane.smith@example.com").andExpect(status().isCreated());
+
+            register("Jane.Smith@Example.COM").andExpect(status().isConflict());
+        }
+    }
 }
