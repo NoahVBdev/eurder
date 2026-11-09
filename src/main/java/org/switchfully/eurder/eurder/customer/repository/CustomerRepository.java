@@ -1,16 +1,17 @@
 package org.switchfully.eurder.eurder.customer.repository;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface CustomerRepository {
-    Customer save(Customer customer);
-    boolean existsByEmail(String email);
-    Optional<Customer> findById(@NotNull UUID id);
-    List<Customer> getAll();
-    Optional<Customer> findByEmail(@NotNull String email);
+@Repository
+public interface CustomerRepository extends JpaRepository<Customer, UUID> {
+    boolean existsByEmail(@NotBlank @Email String email);
+    Optional<Customer> findByEmail(@NotNull @Email String email);
 }

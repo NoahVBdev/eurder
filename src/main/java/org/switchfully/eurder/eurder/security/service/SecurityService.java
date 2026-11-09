@@ -36,7 +36,7 @@ public class SecurityService {
             @Value("${eurder.security.admin.password}") String adminPasswordHash) {
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
-        this.adminEmail = adminEmail;
+        this.adminEmail = Customer.normalizeEmail(adminEmail);
         this.adminPasswordHash = passwordEncoder.encode(adminPasswordHash);
     }
 
@@ -55,24 +55,26 @@ public class SecurityService {
 
         // Get credentials
         Credentials credentials = decode(authorization);
+        String email = Customer.normalizeEmail(credentials.email);
+        String password = credentials.password;
 
         // Check for admin
-        if (adminEmail.equalsIgnoreCase(credentials.email())) {
-            checkPassword(credentials.password(), adminPasswordHash);
+        if (adminEmail.equalsIgnoreCase(email)) {
+            checkPassword(password, adminPasswordHash);
             log.trace("Logged in as admin");
             return new AuthenticatedUser(adminEmail, Role.ADMIN);
         }
 
         // Check if password hash matches
-        String passwordHash = customerRepository.findByEmail(credentials.email())
+        String passwordHash = customerRepository.findByEmail(email)
                 .map(Customer::getPasswordHash)
                 // same message as a wrong password: don't reveal which emails exist
                 .orElseThrow(() -> new UnauthorizedException(INVALID_CREDENTIALS));
-        checkPassword(credentials.password(), passwordHash);
+        checkPassword(password, passwordHash);
 
         // Authorize user
         log.trace("Logged in as customer");
-        return new AuthenticatedUser(credentials.email(), Role.CUSTOMER);
+        return new AuthenticatedUser(email, Role.CUSTOMER);
     }
 
     private void checkPassword(String rawPassword, String passwordHash) {
