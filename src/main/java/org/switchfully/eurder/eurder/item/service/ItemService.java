@@ -1,7 +1,6 @@
 package org.switchfully.eurder.eurder.item.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateOrderDTO;
 import org.switchfully.eurder.eurder.eurder.domain.ItemGroup;
