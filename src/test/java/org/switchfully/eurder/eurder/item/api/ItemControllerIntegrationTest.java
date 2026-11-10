@@ -45,14 +45,10 @@ class ItemControllerIntegrationTest {
         item.put("name", "Fridge Coolio Z");
         item.put("description", "Energy-efficient fridge-freezer, 300 litres");
         item.put("price", new BigDecimal("749.95"));
-        item.put("amount", 12);
+        item.put("stock", 12);
         return item;
     }
 
-    @BeforeEach
-    void setUp() {
-        itemRepository.deleteAll();
-    }
 
     // Helper for post requests
     private ResultActions postItem(Map<String, Object> item) throws Exception {
@@ -76,7 +72,7 @@ class ItemControllerIntegrationTest {
                     .andExpect(jsonPath("$.name").value("Fridge Coolio Z"))
                     .andExpect(jsonPath("$.description").value("Energy-efficient fridge-freezer, 300 litres"))
                     .andExpect(jsonPath("$.price").value(749.95))
-                    .andExpect(jsonPath("$.amount").value(12))
+                    .andExpect(jsonPath("$.stock").value(12))
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
@@ -90,7 +86,7 @@ class ItemControllerIntegrationTest {
             assertThat(stored.getName()).isEqualTo("Fridge Coolio Z");
             assertThat(stored.getDescription()).isEqualTo("Energy-efficient fridge-freezer, 300 litres");
             assertThat(stored.getPrice()).isEqualByComparingTo("749.95");
-            assertThat(stored.getAmount()).isEqualTo(12);
+            assertThat(stored.getStock()).isEqualTo(12);
         }
 
         @Test
@@ -149,33 +145,33 @@ class ItemControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("with null amount returns 400 Bad Request")
-        void givenBlankAmount_returns400() throws Exception {
+        @DisplayName("with null stock returns 400 Bad Request")
+        void givenBlankStock_returns400() throws Exception {
             // Arrange
             Map<String, Object> item = validItem();
-            item.put("amount", null);
+            item.put("stock", null);
 
             // Act + Assert
             postItem(item).andExpect(status().isBadRequest());
         }
 
         @Test
-        @DisplayName("with negative amount returns 400 Bad Request")
-        void givenNegativeAmount_returns400() throws Exception {
+        @DisplayName("with negative stock returns 400 Bad Request")
+        void givenNegativeStock_returns400() throws Exception {
             // Arrange
             Map<String, Object> item = validItem();
-            item.put("amount", -12);
+            item.put("stock", -12);
 
             // Act + Assert
             postItem(item).andExpect(status().isBadRequest());
         }
 
         @Test
-        @DisplayName("with missing amount returns 400 Bad Request")
-        void givenMissingAmount_returns400() throws Exception {
+        @DisplayName("with missing stock returns 400 Bad Request")
+        void givenMissingStock_returns400() throws Exception {
             // Arrange
             Map<String, Object> item = validItem();
-            item.remove("amount");
+            item.remove("stock");
 
             // Act + Assert
             postItem(item).andExpect(status().isBadRequest());

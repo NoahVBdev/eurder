@@ -1,6 +1,7 @@
 package org.switchfully.eurder.eurder.eurder.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.switchfully.eurder.eurder.customer.service.CustomerService;
 import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateOrderDTO;
 import org.switchfully.eurder.eurder.eurder.api.dto.response.OrderDTO;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ItemService itemService;

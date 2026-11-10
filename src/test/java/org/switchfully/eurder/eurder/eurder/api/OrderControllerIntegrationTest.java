@@ -1,5 +1,6 @@
 package org.switchfully.eurder.eurder.eurder.api;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -98,7 +99,7 @@ class OrderControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("Ordering exactly the stock amount ships next day")
+        @DisplayName("Ordering exactly the stock stock ships next day")
         void placeOrder_exactStock_shippingDateIsNextDay() throws Exception {
             Customer customer = aCustomer();
             Item item = anItem("Toaster", "25.00", 4);
@@ -141,7 +142,7 @@ class OrderControllerIntegrationTest {
             placeOrder(customer.getEmail(),request).andExpect(status().isCreated());
 
             Item updated = itemRepository.findById(item.getId()).orElseThrow();
-            assertThat(updated.getAmount()).isEqualTo(3);
+            assertThat(updated.getStock()).isEqualTo(3);
         }
 
         @Test
@@ -200,7 +201,7 @@ class OrderControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("Negative amount returns 400")
+        @DisplayName("Negative stock returns 400")
         void placeOrder_negativeAmount_returns400() throws Exception {
             Customer customer = aCustomer();
             Item item = anItem("Lamp", "20.00", 5);

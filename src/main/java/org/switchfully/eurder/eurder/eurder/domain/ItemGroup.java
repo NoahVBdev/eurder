@@ -29,7 +29,7 @@ public class ItemGroup {
     }
 
     private @NonNull LocalDate calculateShippingDate(Item item, int amount, LocalDate orderDate) {
-        return item.getAmount() >= amount
+        return item.getStock() >= amount
                 ? orderDate.plusDays(DAYS_WHEN_IN_STOCK)
                 : orderDate.plusDays(DAYS_WHEN_OUT_OF_STOCK);
     }

@@ -1,20 +1,18 @@
 package org.switchfully.eurder.eurder.customer.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.springframework.data.domain.Persistable;
 import org.switchfully.eurder.eurder.common.domain.Address;
+import org.switchfully.eurder.eurder.common.domain.BaseEntity;
 
 import java.util.Locale;
-import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "customer")
-public class Customer implements Persistable<UUID> {
+public class Customer extends BaseEntity {
 
-    @Id
-    private UUID id;
     private String firstName;
     private String lastName;
     private String email;
@@ -22,8 +20,6 @@ public class Customer implements Persistable<UUID> {
     private Address address;
     private String phoneNumber;
     private String passwordHash;
-    @Transient
-    private boolean isNew = true;
 
     public Customer(String firstName, String lastName, String email, Address address, String phoneNumber, String passwordHash) {
         validateFirstName(firstName);
@@ -33,7 +29,6 @@ public class Customer implements Persistable<UUID> {
         validatePhoneNumber(phoneNumber);
         validatePasswordHash(passwordHash);
 
-        this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = normalizeEmail(email);
@@ -44,6 +39,8 @@ public class Customer implements Persistable<UUID> {
 
     protected Customer() {
     }
+
+    // Getters & Setters
 
     //    Validators
     private static void validateFirstName(String firstName) {
@@ -77,11 +74,6 @@ public class Customer implements Persistable<UUID> {
 
     public static String normalizeEmail(String email) {
         return email.toLowerCase(Locale.ROOT);
-    }
-
-    @Override
-    public UUID getId() {
-        return id;
     }
 
     public String getFirstName() {
@@ -132,34 +124,5 @@ public class Customer implements Persistable<UUID> {
     public String getPasswordHash() {
         return passwordHash;
     }
-
-    /**
-     * Returns if the {@code Persistable} is new or was persisted already.
-     *
-     * @return if {@literal true} the object is new.
-     */
-    @Override
-    public boolean isNew() {
-        return this.isNew;
-    }
-
-    @PostPersist
-    @PostLoad
-    protected void markAsNotNew() {
-        this.isNew = false;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Customer customer = (Customer) o;
-        return Objects.equals(id, customer.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
 }
 

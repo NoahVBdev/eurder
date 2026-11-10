@@ -29,9 +29,12 @@ public class ItemService {
     public List<ItemGroup> createItemGroups(CreateOrderDTO createOrderDTO, LocalDate today) {
         return createOrderDTO.itemGroups().stream()
                 .map(itemGroupDTO -> {
-                    Item item = itemRepository.findById(itemGroupDTO.itemId()).orElseThrow(() -> new ItemNotFoundException(itemGroupDTO.itemId().toString()));
+                    Item item = itemRepository.findById(itemGroupDTO.itemId())
+                            .orElseThrow(() -> new ItemNotFoundException(itemGroupDTO.itemId().toString()));
+
                     ItemGroup itemGroup = new ItemGroup(item, itemGroupDTO.amount(), today);
                     item.decreaseStock(itemGroupDTO.amount());
+                    
                     return itemGroup;
                 })
                 .toList();

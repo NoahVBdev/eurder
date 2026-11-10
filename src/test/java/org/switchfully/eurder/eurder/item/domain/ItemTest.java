@@ -17,25 +17,25 @@ class ItemTest {
     private static final String NAME = "Fridge Coolio Z";
     private static final String DESCRIPTION = "Energy-efficient fridge-freezer, 300 litres";
     private static final BigDecimal PRICE = new BigDecimal("749.95");
-    private static final Integer AMOUNT = 12;
+    private static final int STOCK = 12;
 
     @Test
     @DisplayName("with valid data creates an item with a generated id")
     void givenValidData_createsItem() {
-        Item item = new Item(NAME, DESCRIPTION, PRICE, AMOUNT);
+        Item item = new Item(NAME, DESCRIPTION, PRICE, STOCK);
 
         assertThat(item.getId()).isNotNull();
         assertThat(item.getName()).isEqualTo(NAME);
         assertThat(item.getDescription()).isEqualTo(DESCRIPTION);
         assertThat(item.getPrice()).isEqualByComparingTo(PRICE);
-        assertThat(item.getAmount()).isEqualTo(AMOUNT);
+        assertThat(item.getStock()).isEqualTo(STOCK);
     }
 
     @Test
     @DisplayName("two items with the same data get different ids")
     void givenSameData_generatesDifferentIds() {
-        Item first = new Item(NAME, DESCRIPTION, PRICE, AMOUNT);
-        Item second = new Item(NAME, DESCRIPTION, PRICE, AMOUNT);
+        Item first = new Item(NAME, DESCRIPTION, PRICE, STOCK);
+        Item second = new Item(NAME, DESCRIPTION, PRICE, STOCK);
 
         assertThat(first.getId()).isNotEqualTo(second.getId());
         assertThat(first).isNotEqualTo(second);
@@ -50,7 +50,7 @@ class ItemTest {
         @DisplayName("null, empty or blank is rejected")
         void givenBlankName_throws(String name) {
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> new Item(name, DESCRIPTION, PRICE, AMOUNT))
+                    .isThrownBy(() -> new Item(name, DESCRIPTION, PRICE, STOCK))
                     .withMessageContaining("Name");
         }
     }
@@ -64,7 +64,7 @@ class ItemTest {
         @DisplayName("null, empty or blank is rejected")
         void givenBlankDescription_throws(String description) {
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> new Item(NAME, description, PRICE, AMOUNT))
+                    .isThrownBy(() -> new Item(NAME, description, PRICE, STOCK))
                     .withMessageContaining("Description");
         }
     }
@@ -76,7 +76,7 @@ class ItemTest {
         @DisplayName("null is rejected")
         void givenNullPrice_throws() {
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> new Item(NAME, DESCRIPTION, null, AMOUNT))
+                    .isThrownBy(() -> new Item(NAME, DESCRIPTION, null, STOCK))
                     .withMessageContaining("Price");
         }
 
@@ -85,7 +85,7 @@ class ItemTest {
         @DisplayName("zero or negative is rejected")
         void givenZeroOrNegativePrice_throws(String price) {
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> new Item(NAME, DESCRIPTION, new BigDecimal(price), AMOUNT))
+                    .isThrownBy(() -> new Item(NAME, DESCRIPTION, new BigDecimal(price), STOCK))
                     .withMessageContaining("Price");
         }
 
@@ -93,37 +93,37 @@ class ItemTest {
         @DisplayName("more than two decimals is rejected")
         void givenMoreThanTwoDecimals_throws() {
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> new Item(NAME, DESCRIPTION, new BigDecimal("749.955"), AMOUNT))
+                    .isThrownBy(() -> new Item(NAME, DESCRIPTION, new BigDecimal("749.955"), STOCK))
                     .withMessageContaining("Price");
         }
 
         @Test
         @DisplayName("smallest positive price is accepted")
         void givenOneCent_createsItem() {
-            Item item = new Item(NAME, DESCRIPTION, new BigDecimal("0.01"), AMOUNT);
+            Item item = new Item(NAME, DESCRIPTION, new BigDecimal("0.01"), STOCK);
 
             assertThat(item.getPrice()).isEqualByComparingTo("0.01");
         }
     }
 
     @Nested
-    @DisplayName("Amount")
+    @DisplayName("Stock")
     class Amount {
-        @ParameterizedTest(name = "[{index}] amount = {0}")
+        @ParameterizedTest(name = "[{index}] stock = {0}")
         @ValueSource(ints = {-1, -12, Integer.MIN_VALUE})
         @DisplayName("negative is rejected")
-        void givenNegativeAmount_throws(int amount) {
+        void givenNegativeStock_throws(int amount) {
             assertThatIllegalArgumentException()
                     .isThrownBy(() -> new Item(NAME, DESCRIPTION, PRICE, amount))
-                    .withMessageContaining("Amount");
+                    .withMessageContaining("Stock");
         }
 
         @Test
         @DisplayName("zero is accepted (out of stock)")
-        void givenZeroAmount_createsItem() {
+        void givenZeroStock_createsItem() {
             Item item = new Item(NAME, DESCRIPTION, PRICE, 0);
 
-            assertThat(item.getAmount()).isZero();
+            assertThat(item.getStock()).isZero();
         }
     }
 
@@ -132,23 +132,23 @@ class ItemTest {
     class DecreaseStock {
 
         @Test
-        @DisplayName("Decrease stock subtracts ordered amount")
+        @DisplayName("Decrease stock subtracts ordered stock")
         void decreaseStock_subtractsOrderedAmount() {
             Item item = new Item("Fridge", "Cold", new BigDecimal("500.00"), 10);
 
             item.decreaseStock(3);
 
-            assertThat(item.getAmount()).isEqualTo(7);
+            assertThat(item.getStock()).isEqualTo(7);
         }
 
         @Test
-        @DisplayName("Decreasing stock more than available amount becomes zero")
+        @DisplayName("Decreasing stock more than available stock becomes zero")
         void decreaseStock_moreThanAvailable_stockBecomesZero() {
             Item item = new Item("Fridge", "Cold", new BigDecimal("500.00"), 2);
 
             item.decreaseStock(5);
 
-            assertThat(item.getAmount()).isZero();
+            assertThat(item.getStock()).isZero();
         }
     }
 }
