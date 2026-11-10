@@ -1,6 +1,7 @@
 package org.switchfully.eurder.eurder.item.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateOrderDTO;
 import org.switchfully.eurder.eurder.eurder.domain.ItemGroup;
 import org.switchfully.eurder.eurder.item.api.dto.CreateItemDTO;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
@@ -22,10 +24,11 @@ public class ItemService {
         this.itemMapper = itemMapper;
     }
 
+    @Transactional
     public ItemDTO createItem(CreateItemDTO createItemDTO) {
         return itemMapper.toDTO(itemRepository.save(itemMapper.toDomain(createItemDTO)));
     }
-
+    @Transactional
     public List<ItemGroup> createItemGroups(CreateOrderDTO createOrderDTO, LocalDate today) {
         return createOrderDTO.itemGroups().stream()
                 .map(itemGroupDTO -> {

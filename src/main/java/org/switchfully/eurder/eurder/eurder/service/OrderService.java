@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ItemService itemService;
@@ -32,6 +32,7 @@ public class OrderService {
         this.clock = clock;
     }
 
+    @Transactional
     public OrderDTO placeOrder(String customerEmail, CreateOrderDTO createOrderDTO) {
         CustomerOrderingDetails customer = customerService.getOrderingDetails(customerEmail);
         LocalDate today = LocalDate.now(clock);
