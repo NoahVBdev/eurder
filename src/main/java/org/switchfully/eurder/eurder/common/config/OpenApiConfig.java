@@ -28,7 +28,7 @@ public class OpenApiConfig {
                         .contact(new Contact().name("NoahVBDev").email("noahvanbrabant@hotmail.com")))
                 .tags(List.of(
                         new Tag().name("Customers").description("Create and view customers"),
-                        new Tag().name("Items").description("Manage items and stock"),
-                        new Tag().name("Orders").description("Place, view and reorder orders")));
+                        new Tag().name("Items").description("Add items"),
+                        new Tag().name("Orders").description("Place orders")));
     }
 }
