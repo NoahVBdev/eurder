@@ -3,11 +3,14 @@ package org.switchfully.eurder.eurder.eurder.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.switchfully.eurder.eurder.common.domain.Address;
 import org.switchfully.eurder.eurder.eurder.exception.ItemGroupException;
 import org.switchfully.eurder.eurder.item.domain.Item;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -51,5 +54,45 @@ class ItemGroupTest {
         Item item = new Item("Fridge", "Cold", new BigDecimal("500.00"), 10);
         assertThatThrownBy(() -> new ItemGroup(item, 0, LocalDate.now()))
                 .isInstanceOf(ItemGroupException.class);
+    }
+
+    @Test
+    @DisplayName("A new item group does not belong to an order yet")
+    void givenNewItemGroup_whenGettingOrder_returnNull() {
+        // Arrange + Act
+        Item item = new Item("Fridge", "Cold", new BigDecimal("500.00"), 10);
+        ItemGroup group = new ItemGroup(item, 1, LocalDate.now());
+
+        // Assert
+        assertThat(group.getOrder()).isNull();
+    }
+
+    @Test
+    @DisplayName("An item group that belongs to an order cannot be moved to another order")
+    void givenItemGroupInOrder_whenAddingToOtherOrder_throwItemGroupException() {
+        // Arrange
+        Item item = new Item("Fridge", "Cold", new BigDecimal("500.00"), 10);
+        ItemGroup group = new ItemGroup(item, 1, LocalDate.now());
+        Address address = new Address("Rue Neuve", "100B", "1000", "Brussels", "Belgium");
+        new Order(UUID.randomUUID(), address, List.of(group), LocalDate.now());
+
+        // Act + Assert
+        assertThatThrownBy(() -> new Order(UUID.randomUUID(), address, List.of(group), LocalDate.now()))
+                .isInstanceOf(ItemGroupException.class);
+    }
+
+    @Test
+    @DisplayName("An item group copies the item's name and price at the time of ordering")
+    void givenItem_whenCreatingItemGroup_returnNameAndPriceSnapshot() {
+        // Arrange
+        Item item = new Item("Fridge", "Cold", new BigDecimal("500.00"), 10);
+
+        // Act
+        ItemGroup group = new ItemGroup(item, 1, LocalDate.now());
+
+        // Assert
+        assertThat(group.getItemId()).isEqualTo(item.getId());
+        assertThat(group.getItemName()).isEqualTo("Fridge");
+        assertThat(group.getPricePerUnit()).isEqualByComparingTo("500.00");
     }
 }

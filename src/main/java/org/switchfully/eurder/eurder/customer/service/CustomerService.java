@@ -84,4 +84,13 @@ public class CustomerService {
                 && cve.getConstraintName() != null
                 && cve.getConstraintName().toLowerCase(Locale.ROOT).contains(UNIQUE_EMAIL_CONSTRAINT);
     }
+
+    public CustomerOrderingDetails getOrderingDetails(String customerEmail) {
+        Customer customer = customerRepository.findByEmail(Customer.normalizeEmail(customerEmail))
+                .orElseThrow(() -> {
+                    log.debug("Could not find customer with email: {}", customerEmail);
+                    return new CustomerNotFoundException(customerEmail);
+                });
+        return new CustomerOrderingDetails(customer.getId(), customer.getAddress());
+    }
 }

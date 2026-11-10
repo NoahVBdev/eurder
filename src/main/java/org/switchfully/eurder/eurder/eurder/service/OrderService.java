@@ -2,6 +2,7 @@ package org.switchfully.eurder.eurder.eurder.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.switchfully.eurder.eurder.customer.service.CustomerOrderingDetails;
 import org.switchfully.eurder.eurder.customer.service.CustomerService;
 import org.switchfully.eurder.eurder.eurder.api.dto.request.CreateOrderDTO;
 import org.switchfully.eurder.eurder.eurder.api.dto.response.OrderDTO;
@@ -13,7 +14,6 @@ import org.switchfully.eurder.eurder.item.service.ItemService;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -33,10 +33,11 @@ public class OrderService {
     }
 
     public OrderDTO placeOrder(String customerEmail, CreateOrderDTO createOrderDTO) {
-        UUID customerId = customerService.findCustomerByEmail(customerEmail).id();
+        CustomerOrderingDetails customer = customerService.getOrderingDetails(customerEmail);
         LocalDate today = LocalDate.now(clock);
+
         List<ItemGroup> itemGroups = itemService.createItemGroups(createOrderDTO, today);
-        Order order = orderRepository.save(new Order(customerId, itemGroups));
+        Order order = orderRepository.save(new Order(customer.customerId(), customer.address(), itemGroups, today));
         return orderMapper.toDTO(order);
     }
 }

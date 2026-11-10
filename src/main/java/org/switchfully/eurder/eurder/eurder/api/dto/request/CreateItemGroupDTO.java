@@ -5,5 +5,7 @@ import jakarta.validation.constraints.Positive;
 
 import java.util.UUID;
 
-public record CreateItemGroupDTO(@NotNull UUID itemId, @NotNull @Positive int amount) {
+public record CreateItemGroupDTO(
+        @NotNull UUID itemId,
+        @NotNull @Positive int amount) {
 }

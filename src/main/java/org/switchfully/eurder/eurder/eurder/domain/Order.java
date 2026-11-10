@@ -1,24 +1,54 @@
 package org.switchfully.eurder.eurder.eurder.domain;
 
-import org.switchfully.eurder.eurder.customer.domain.Customer;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import org.switchfully.eurder.eurder.common.domain.Address;
+import org.switchfully.eurder.eurder.common.domain.BaseEntity;
 import org.switchfully.eurder.eurder.eurder.exception.OrderException;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
-public class Order {
-    private final UUID id;
-    private final UUID customerId;
-    private final List<ItemGroup> itemGroups;
+@Entity
+@Table(name = "eurder")
+public class Order extends BaseEntity {
 
-    public Order(UUID customerId, List<ItemGroup> itemGroups) {
+    private UUID customerId;
+
+    @Embedded
+    private Address shippingAddress; // Snapshot, see decision in #23
+
+    private LocalDate orderDate;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemGroup> itemGroups = new ArrayList<>();
+
+    public Order(UUID customerId, Address shippingAddress, List<ItemGroup> itemGroups, LocalDate orderDate) {
+        if (customerId == null) throw new OrderException("Customer is required");
+        if (shippingAddress == null) throw new OrderException("Shipping address is required");
+        if (orderDate == null) throw new OrderException("Order date is required");
         if (itemGroups == null || itemGroups.isEmpty())
             throw new OrderException("An order must contain one or more item groups");
-        this.id = UUID.randomUUID();
+
         this.customerId = customerId;
-        this.itemGroups = List.copyOf(itemGroups);
+        this.shippingAddress = shippingAddress;
+        this.orderDate = orderDate;
+        itemGroups.forEach(this::addItemGroup);
+    }
+
+    protected Order() {
+    }
+
+    private void addItemGroup(ItemGroup itemGroup) {
+        itemGroup.assignTo(this);
+        this.itemGroups.add(itemGroup);
     }
 
     public BigDecimal getTotalPrice() {
@@ -27,27 +57,19 @@ public class Order {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public UUID getId() {
-        return id;
-    }
-
     public UUID getCustomerId() {
         return customerId;
     }
 
+    public Address getShippingAddress() {
+        return shippingAddress;
+    }
+
+    public LocalDate getOrderDate() {
+        return orderDate;
+    }
+
     public List<ItemGroup> getItemGroups() {
-        return itemGroups;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Order order = (Order) o;
-        return Objects.equals(id, order.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
+        return Collections.unmodifiableList(itemGroups);
     }
 }
