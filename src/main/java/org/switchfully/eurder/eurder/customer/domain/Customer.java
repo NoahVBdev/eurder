@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.data.domain.Persistable;
 import org.switchfully.eurder.eurder.common.domain.Address;
+import org.switchfully.eurder.eurder.common.domain.BaseEntity;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -11,10 +12,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "customer")
-public class Customer implements Persistable<UUID> {
+public class Customer extends BaseEntity {
 
-    @Id
-    private UUID id;
     private String firstName;
     private String lastName;
     private String email;
@@ -22,8 +21,6 @@ public class Customer implements Persistable<UUID> {
     private Address address;
     private String phoneNumber;
     private String passwordHash;
-    @Transient
-    private boolean isNew = true;
 
     public Customer(String firstName, String lastName, String email, Address address, String phoneNumber, String passwordHash) {
         validateFirstName(firstName);
@@ -33,7 +30,6 @@ public class Customer implements Persistable<UUID> {
         validatePhoneNumber(phoneNumber);
         validatePasswordHash(passwordHash);
 
-        this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = normalizeEmail(email);
@@ -45,44 +41,7 @@ public class Customer implements Persistable<UUID> {
     protected Customer() {
     }
 
-    //    Validators
-    private static void validateFirstName(String firstName) {
-        requireNotBlank(firstName, "First name is required");
-    }
-
-    private static void validateLastName(String lastName) {
-        requireNotBlank(lastName, "Last name is required");
-    }
-
-    private static void validateEmail(String email) {
-        if (email == null || !EmailValidator.getInstance().isValid(email))
-            throw new IllegalArgumentException("Valid email is required");
-    }
-
-    private static void validateAddress(Address address) {
-        if (address == null) throw new IllegalArgumentException("Address is required");
-    }
-
-    private static void validatePhoneNumber(String phoneNumber) {
-        requireNotBlank(phoneNumber, "Phone number is required");
-    }
-
-    private static void validatePasswordHash(String passwordHash) {
-        requireNotBlank(passwordHash, "Password is required");
-    }
-
-    private static void requireNotBlank(String value, String message) {
-        if (value == null || value.isBlank()) throw new IllegalArgumentException(message);
-    }
-
-    public static String normalizeEmail(String email) {
-        return email.toLowerCase(Locale.ROOT);
-    }
-
-    @Override
-    public UUID getId() {
-        return id;
-    }
+    // Getters & Setters
 
     public String getFirstName() {
         return firstName;
@@ -133,33 +92,38 @@ public class Customer implements Persistable<UUID> {
         return passwordHash;
     }
 
-    /**
-     * Returns if the {@code Persistable} is new or was persisted already.
-     *
-     * @return if {@literal true} the object is new.
-     */
-    @Override
-    public boolean isNew() {
-        return this.isNew;
+    //    Validators
+    private static void validateFirstName(String firstName) {
+        requireNotBlank(firstName, "First name is required");
     }
 
-    @PostPersist
-    @PostLoad
-    protected void markAsNotNew() {
-        this.isNew = false;
+    private static void validateLastName(String lastName) {
+        requireNotBlank(lastName, "Last name is required");
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Customer customer = (Customer) o;
-        return Objects.equals(id, customer.id);
+    private static void validateEmail(String email) {
+        if (email == null || !EmailValidator.getInstance().isValid(email))
+            throw new IllegalArgumentException("Valid email is required");
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
+    private static void validateAddress(Address address) {
+        if (address == null) throw new IllegalArgumentException("Address is required");
     }
 
+    private static void validatePhoneNumber(String phoneNumber) {
+        requireNotBlank(phoneNumber, "Phone number is required");
+    }
+
+    private static void validatePasswordHash(String passwordHash) {
+        requireNotBlank(passwordHash, "Password is required");
+    }
+
+    private static void requireNotBlank(String value, String message) {
+        if (value == null || value.isBlank()) throw new IllegalArgumentException(message);
+    }
+
+    public static String normalizeEmail(String email) {
+        return email.toLowerCase(Locale.ROOT);
+    }
 }
 
