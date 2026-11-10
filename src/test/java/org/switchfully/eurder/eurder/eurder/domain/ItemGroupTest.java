@@ -36,7 +36,7 @@ class ItemGroupTest {
     }
 
     @Test
-    @DisplayName("Total price is price per unit times amount ordered")
+    @DisplayName("Total price is price per unit times stock ordered")
     void totalPrice_isPriceTimesAmount() {
         Item item = new Item("Fridge", "Cold", new BigDecimal("500.00"), 10);
 
@@ -46,7 +46,7 @@ class ItemGroupTest {
     }
 
     @Test
-    @DisplayName("An item group with amount zero or less throws an ItemGroupException")
+    @DisplayName("An item group with stock zero or less throws an ItemGroupException")
     void amountZeroOrLess_throws() {
         Item item = new Item("Fridge", "Cold", new BigDecimal("500.00"), 10);
         assertThatThrownBy(() -> new ItemGroup(item, 0, LocalDate.now()))

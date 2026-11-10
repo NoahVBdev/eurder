@@ -89,11 +89,6 @@ class CustomerControllerIntegrationTest {
                 .content(customerJsonWithEmail(email)));
     }
 
-    @BeforeEach
-    void setUp() {
-        customerRepository.deleteAll();
-    }
-
     @Nested
     @DisplayName("Creating a customer:")
     class CreateCustomer {

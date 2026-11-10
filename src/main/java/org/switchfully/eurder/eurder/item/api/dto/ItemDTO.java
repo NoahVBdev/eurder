@@ -8,5 +8,5 @@ public record ItemDTO(
         String name,
         String description,
         BigDecimal price,
-        int amount) {
+        int stock) {
 }
