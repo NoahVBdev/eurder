@@ -40,6 +40,7 @@ public class CustomerController {
     @Operation(summary = "Create a customer account", description = "Story 1")
     @ApiResponse(responseCode = "201", description = "Customer created")
     @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
     @ApiResponse(responseCode = "409", description = "Email already in use", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
     @PostMapping(consumes = "application/json", produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
@@ -52,6 +53,7 @@ public class CustomerController {
     @Operation(summary = "View all customers", description = "Story 7")
     @ApiResponse(responseCode = "200", description = "Get all customers", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CustomerDTO.class))))
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
     @ApiResponse(responseCode = "404", description = "No customers found", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
     @GetMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
@@ -63,8 +65,9 @@ public class CustomerController {
     }
 
     @Operation(summary = "View a single customer", description = "Story 8")
-    @ApiResponse(responseCode = "200", description = "Get a single customers", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomerDTO.class)))
+    @ApiResponse(responseCode = "200", description = "Get a single customer", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomerDTO.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
     @ApiResponse(responseCode = "404", description = "No customer found", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
     @GetMapping(path = "/{id}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
