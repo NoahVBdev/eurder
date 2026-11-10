@@ -17,7 +17,7 @@ class ItemTest {
     private static final String NAME = "Fridge Coolio Z";
     private static final String DESCRIPTION = "Energy-efficient fridge-freezer, 300 litres";
     private static final BigDecimal PRICE = new BigDecimal("749.95");
-    private static final Integer STOCK = 12;
+    private static final int STOCK = 12;
 
     @Test
     @DisplayName("with valid data creates an item with a generated id")
@@ -115,7 +115,7 @@ class ItemTest {
         void givenNegativeStock_throws(int amount) {
             assertThatIllegalArgumentException()
                     .isThrownBy(() -> new Item(NAME, DESCRIPTION, PRICE, amount))
-                    .withMessageContaining("Amount");
+                    .withMessageContaining("Stock");
         }
 
         @Test

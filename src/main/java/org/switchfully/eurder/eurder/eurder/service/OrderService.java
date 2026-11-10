@@ -32,7 +32,6 @@ public class OrderService {
         this.clock = clock;
     }
 
-    @Transactional
     public OrderDTO placeOrder(String customerEmail, CreateOrderDTO createOrderDTO) {
         UUID customerId = customerService.findCustomerByEmail(customerEmail).id();
         LocalDate today = LocalDate.now(clock);
