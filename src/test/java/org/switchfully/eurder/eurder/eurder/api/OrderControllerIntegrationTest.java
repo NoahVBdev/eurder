@@ -72,10 +72,11 @@ class OrderControllerIntegrationTest {
             Customer customer = aCustomer();
             Item item = anItem("Fridge", "10.00", 5);
 
-            CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
+            CreateOrderDTO request = new CreateOrderDTO(
+                    customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 2)));
 
-            placeOrder(customer.getEmail(),request)
+            placeOrder(customer.getEmail(), request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.totalPrice").value(20.00))
                     .andExpect(jsonPath("$.itemGroups.length()").value(1))
@@ -89,10 +90,11 @@ class OrderControllerIntegrationTest {
             Customer customer = aCustomer();
             Item item = anItem("Oven", "300.00", 2);
 
-            CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
+            CreateOrderDTO request = new CreateOrderDTO(
+                    customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 3)));
 
-            placeOrder(customer.getEmail(),request)
+            placeOrder(customer.getEmail(), request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.itemGroups[0].shippingDate")
                             .value(LocalDate.now().plusDays(7).toString()));
@@ -104,10 +106,11 @@ class OrderControllerIntegrationTest {
             Customer customer = aCustomer();
             Item item = anItem("Toaster", "25.00", 4);
 
-            CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
+            CreateOrderDTO request = new CreateOrderDTO(
+                    customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 4)));
 
-            placeOrder(customer.getEmail(),request)
+            placeOrder(customer.getEmail(), request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.itemGroups[0].shippingDate")
                             .value(LocalDate.now().plusDays(1).toString()));
@@ -120,11 +123,14 @@ class OrderControllerIntegrationTest {
             Item fridge = anItem("Fridge", "500.00", 10);
             Item lamp = anItem("Lamp", "20.00", 10);
 
-            CreateOrderDTO request = new CreateOrderDTO(customer.getId(), List.of(
-                    new CreateItemGroupDTO(fridge.getId(), 2),   // 1000.00
-                    new CreateItemGroupDTO(lamp.getId(), 3)));   //   60.00
+            CreateOrderDTO request = new CreateOrderDTO(
+                    customer.getId(),
+                    List.of(
+                            new CreateItemGroupDTO(fridge.getId(), 2),   // 1000.00
+                            new CreateItemGroupDTO(lamp.getId(), 3))
+            );   //   60.00
 
-            placeOrder(customer.getEmail(),request)
+            placeOrder(customer.getEmail(), request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.itemGroups.length()").value(2))
                     .andExpect(jsonPath("$.totalPrice").value(1060.00));
@@ -136,10 +142,11 @@ class OrderControllerIntegrationTest {
             Customer customer = aCustomer();
             Item item = anItem("Kettle", "15.00", 5);
 
-            CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
+            CreateOrderDTO request = new CreateOrderDTO(
+                    customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 2)));
 
-            placeOrder(customer.getEmail(),request).andExpect(status().isCreated());
+            placeOrder(customer.getEmail(), request).andExpect(status().isCreated());
 
             Item updated = itemRepository.findById(item.getId()).orElseThrow();
             assertThat(updated.getStock()).isEqualTo(3);
@@ -151,10 +158,11 @@ class OrderControllerIntegrationTest {
             Customer customer = aCustomer();
             Item item = anItem("Mixer", "50.00", 5);
 
-            CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
+            CreateOrderDTO request = new CreateOrderDTO(
+                    customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 1)));
 
-            placeOrder(customer.getEmail(),request)
+            placeOrder(customer.getEmail(), request)
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.itemGroups[0].pricePerUnit").value(50.00))
                     .andExpect(jsonPath("$.itemGroups[0].itemName").value("Mixer"));
@@ -170,10 +178,11 @@ class OrderControllerIntegrationTest {
         void placeOrder_unknownCustomer_returns401() throws Exception {
             Item item = anItem("Oven", "300.00", 5);
 
-            CreateOrderDTO request = new CreateOrderDTO(NON_EXISTING_ID,
+            CreateOrderDTO request = new CreateOrderDTO(
+                    NON_EXISTING_ID,
                     List.of(new CreateItemGroupDTO(item.getId(), 1)));
 
-            placeOrder("unknown@mail.com",request).andExpect(status().isUnauthorized());
+            placeOrder("unknown@mail.com", request).andExpect(status().isUnauthorized());
         }
 
 
@@ -182,10 +191,11 @@ class OrderControllerIntegrationTest {
         void placeOrder_unknownItem_returns404() throws Exception {
             Customer customer = aCustomer();
 
-            CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
+            CreateOrderDTO request = new CreateOrderDTO(
+                    customer.getId(),
                     List.of(new CreateItemGroupDTO(NON_EXISTING_ID, 1)));
 
-            placeOrder(customer.getEmail(),request).andExpect(status().isNotFound());
+            placeOrder(customer.getEmail(), request).andExpect(status().isNotFound());
         }
 
         @Test
@@ -194,10 +204,11 @@ class OrderControllerIntegrationTest {
             Customer customer = aCustomer();
             Item item = anItem("Lamp", "20.00", 5);
 
-            CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
+            CreateOrderDTO request = new CreateOrderDTO(
+                    customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), 0)));
 
-            placeOrder(customer.getEmail(),request).andExpect(status().isBadRequest());
+            placeOrder(customer.getEmail(), request).andExpect(status().isBadRequest());
         }
 
         @Test
@@ -206,10 +217,11 @@ class OrderControllerIntegrationTest {
             Customer customer = aCustomer();
             Item item = anItem("Lamp", "20.00", 5);
 
-            CreateOrderDTO request = new CreateOrderDTO(customer.getId(),
+            CreateOrderDTO request = new CreateOrderDTO(
+                    customer.getId(),
                     List.of(new CreateItemGroupDTO(item.getId(), -1)));
 
-            placeOrder(customer.getEmail(),request).andExpect(status().isBadRequest());
+            placeOrder(customer.getEmail(), request).andExpect(status().isBadRequest());
         }
 
         @Test
@@ -219,7 +231,7 @@ class OrderControllerIntegrationTest {
 
             CreateOrderDTO request = new CreateOrderDTO(customer.getId(), List.of());
 
-            placeOrder(customer.getEmail(),request).andExpect(status().isBadRequest());
+            placeOrder(customer.getEmail(), request).andExpect(status().isBadRequest());
         }
     }
 }

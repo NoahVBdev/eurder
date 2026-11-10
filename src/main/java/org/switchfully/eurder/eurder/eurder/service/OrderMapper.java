@@ -14,6 +14,6 @@ public class OrderMapper {
     }
 
     public ItemGroupDTO toDTO(ItemGroup itemGroup) {
-        return new ItemGroupDTO(itemGroup.getItemId(), itemGroup.getItemName(), itemGroup.getAmount(), itemGroup.getPricePerUnit(), itemGroup.getTotalPrice(), itemGroup.getShippingDate());
+        return new ItemGroupDTO(itemGroup.getId(), itemGroup.getItemId(),  itemGroup.getItemName(), itemGroup.getAmount(), itemGroup.getPricePerUnit(), itemGroup.getTotalPrice(), itemGroup.getShippingDate());
     }
 }
