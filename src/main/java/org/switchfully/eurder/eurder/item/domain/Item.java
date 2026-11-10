@@ -2,10 +2,10 @@ package org.switchfully.eurder.eurder.item.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import org.switchfully.eurder.eurder.common.domain.BaseEntity;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Entity
 @Table(name = "item")
@@ -15,6 +15,8 @@ public class Item extends BaseEntity {
     private String description;
     private BigDecimal price;
     private int stock;
+    @Version
+    private int version;
 
     public Item(String name, String description, BigDecimal price, int stock) {
         if (name == null || name.isBlank()) throw new IllegalArgumentException("Name is required");

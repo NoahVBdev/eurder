@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.switchfully.eurder.eurder.common.exception.ResourceNotFoundException;
 import org.switchfully.eurder.eurder.customer.api.dto.CreateCustomerDTO;
 import org.switchfully.eurder.eurder.customer.api.dto.CustomerDTO;
@@ -17,6 +18,7 @@ import org.switchfully.eurder.eurder.customer.repository.CustomerRepository;
 import java.util.*;
 
 @Service
+@Transactional(readOnly = true)
 public class CustomerService {
 
     private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
@@ -32,6 +34,7 @@ public class CustomerService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public CustomerDTO createCustomer(CreateCustomerDTO createCustomerDTO) {
         if (customerRepository.existsByEmail(Customer.normalizeEmail(createCustomerDTO.email()))) {
             throw new EmailAlreadyInUseException(createCustomerDTO.email());
@@ -61,7 +64,7 @@ public class CustomerService {
         return customerMapper.toDTO(customers);
     }
 
-    public CustomerDTO findCustomerById(UUID id) throws CustomerNotFoundException {
+    public CustomerDTO findCustomerById(UUID id) {
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isEmpty()) {
             log.debug("Could not find customer with id: {}", id);

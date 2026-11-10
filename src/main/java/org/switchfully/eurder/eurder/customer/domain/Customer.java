@@ -4,6 +4,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.springframework.data.annotation.Version;
 import org.switchfully.eurder.eurder.common.domain.Address;
 import org.switchfully.eurder.eurder.common.domain.BaseEntity;
 

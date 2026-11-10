@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.switchfully.eurder.eurder.customer.domain.Customer;
 import org.switchfully.eurder.eurder.customer.repository.CustomerRepository;
 import org.switchfully.eurder.eurder.security.domain.AuthenticatedUser;
@@ -18,6 +19,7 @@ import java.util.Base64;
 import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
 public class SecurityService {
     private static final Logger log = LoggerFactory.getLogger(SecurityService.class);
 
